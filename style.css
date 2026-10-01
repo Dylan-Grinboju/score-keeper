@@ -1,0 +1,320 @@
+:root {
+  --red: #d63a40;
+  --blue: #3e63dd;
+  --bg: #0f1012;
+  --ink: #fff;
+  --sa-top: env(safe-area-inset-top, 0px);
+  --sa-right: env(safe-area-inset-right, 0px);
+  --sa-bottom: env(safe-area-inset-bottom, 0px);
+  --sa-left: env(safe-area-inset-left, 0px);
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--bg);
+}
+
+body {
+  position: fixed;
+  inset: 0;
+  color: var(--ink);
+  font-family: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+svg {
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The board is drawn in landscape. On a touch screen held upright it is
+   given a quarter turn, so it reads correctly once the phone is turned. */
+.app {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+}
+
+@media (orientation: portrait) and (pointer: coarse) {
+  .app {
+    inset: auto;
+    top: 50%;
+    left: 50%;
+    width: 100vh;
+    width: 100dvh;
+    height: 100vw;
+    height: 100dvw;
+    transform: translate(-50%, -50%) rotate(90deg);
+    /* The safe areas turn with the board. */
+    --sa-top: env(safe-area-inset-right, 0px);
+    --sa-right: env(safe-area-inset-bottom, 0px);
+    --sa-bottom: env(safe-area-inset-left, 0px);
+    --sa-left: env(safe-area-inset-top, 0px);
+  }
+}
+
+/* One half of the board per player. */
+.side {
+  --edge: 16px; /* space at the outer edge of the screen */
+  --seam: 36px; /* room for the controls in the middle */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding: calc(var(--sa-top) + 12px) var(--seam) calc(var(--sa-bottom) + 16px);
+  background: var(--color);
+}
+
+.side[data-side="0"] {
+  padding-left: calc(var(--sa-left) + var(--edge));
+}
+
+.side[data-side="1"] {
+  padding-right: calc(var(--sa-right) + var(--edge));
+}
+
+.side[data-color="red"] {
+  --color: var(--red);
+}
+
+.side[data-color="blue"] {
+  --color: var(--blue);
+}
+
+/* The whole half is the "add a point" button; the rest sits on top of it. */
+.plus {
+  position: absolute;
+  inset: 0;
+}
+
+.plus:focus-visible {
+  outline: 4px solid rgb(255 255 255 / .7);
+  outline-offset: -10px;
+}
+
+.name,
+.minus {
+  position: relative;
+  z-index: 1;
+}
+
+.name {
+  max-width: 100%;
+  padding: .45em 1em;
+  border-radius: 999px;
+  background: rgb(0 0 0 / .14);
+  font-size: clamp(13px, 4.2vmin, 22px);
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.name:active {
+  background: rgb(0 0 0 / .26);
+}
+
+.score-wrap {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  align-self: stretch;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  container-type: size;
+  pointer-events: none;
+}
+
+.score {
+  --chars: 2;
+  display: block;
+  font-size: 32vmin;
+  /* As big as the space allows; --chars shrinks it for long numbers. */
+  font-size: min(84cqh, calc(136cqw / var(--chars)));
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.03em;
+  text-shadow: 0 .03em .1em rgb(0 0 0 / .15);
+}
+
+.hint {
+  position: absolute;
+  inset: auto 0 2%;
+  text-align: center;
+  font-size: clamp(11px, 3vmin, 15px);
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+.app.fresh .hint {
+  opacity: .75;
+}
+
+.minus {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: clamp(48px, 15vmin, 72px);
+  height: clamp(48px, 15vmin, 72px);
+  border-radius: 50%;
+  background: rgb(0 0 0 / .16);
+  transition: background-color .15s, transform .15s;
+}
+
+.minus svg {
+  width: 44%;
+  height: 44%;
+  stroke-width: 3;
+}
+
+.minus:active {
+  background: rgb(0 0 0 / .3);
+  transform: scale(.92);
+}
+
+/* Undo / swap / reset / full screen, floating on the seam. */
+.controls {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px;
+  border-radius: 999px;
+  background: rgb(15 16 18 / .72);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgb(0 0 0 / .25);
+  transform: translate(-50%, -50%);
+}
+
+.ctrl {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  transition: background-color .15s, color .15s, opacity .15s, transform .15s;
+}
+
+.ctrl[hidden] {
+  display: none;
+}
+
+.ctrl svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
+
+.ctrl:active {
+  background: rgb(255 255 255 / .16);
+  transform: scale(.92);
+}
+
+.ctrl:disabled {
+  opacity: .3;
+  cursor: default;
+}
+
+/* Reset waits for a second tap. */
+.ctrl[data-armed] {
+  background: #fff;
+  color: var(--bg);
+}
+
+.ctrl:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 1px;
+}
+
+.icon-exit,
+.app.is-fullscreen .icon-enter {
+  display: none;
+}
+
+.app.is-fullscreen .icon-exit {
+  display: block;
+}
+
+@media (hover: hover) {
+  .name:hover {
+    background: rgb(0 0 0 / .22);
+  }
+
+  .minus:hover {
+    background: rgb(0 0 0 / .24);
+  }
+
+  .ctrl:not(:disabled):hover {
+    background: rgb(255 255 255 / .12);
+  }
+
+  .ctrl[data-armed]:hover {
+    background: #fff;
+  }
+}
+
+.toast {
+  position: absolute;
+  bottom: calc(var(--sa-bottom) + 20px);
+  left: 50%;
+  z-index: 3;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgb(15 16 18 / .88);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 8px);
+  transition: opacity .2s, transform .2s;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}

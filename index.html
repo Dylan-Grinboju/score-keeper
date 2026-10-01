@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Score Keeper</title>
+  <meta name="description" content="A two-player score keeper for your phone, laid out for landscape.">
+  <meta name="theme-color" content="#0f1012">
+  <meta name="color-scheme" content="dark">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Score">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="app" id="app">
+    <section class="side" data-side="0" data-color="red">
+      <button class="plus" type="button"></button>
+      <button class="name" type="button">Player 1</button>
+      <div class="score-wrap">
+        <output class="score">0</output>
+        <span class="hint">Tap to score</span>
+      </div>
+      <button class="minus" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>
+      </button>
+    </section>
+
+    <section class="side" data-side="1" data-color="blue">
+      <button class="plus" type="button"></button>
+      <button class="name" type="button">Player 2</button>
+      <div class="score-wrap">
+        <output class="score">0</output>
+        <span class="hint">Tap to score</span>
+      </div>
+      <button class="minus" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>
+      </button>
+    </section>
+
+    <nav class="controls" aria-label="Game controls">
+      <button class="ctrl" type="button" data-action="undo" aria-label="Undo" title="Undo">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+      </button>
+      <button class="ctrl" type="button" data-action="swap" aria-label="Swap sides" title="Swap sides">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+      </button>
+      <button class="ctrl" type="button" data-action="reset" aria-label="Reset scores" title="Reset scores">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"/><path d="M3 3v5h5"/></svg>
+      </button>
+      <button class="ctrl" type="button" data-action="fullscreen" aria-label="Full screen" title="Full screen" hidden>
+        <svg class="icon-enter" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+        <svg class="icon-exit" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
+      </button>
+    </nav>
+
+    <div class="toast" role="status"></div>
+  </main>
+</body>
+</html>
